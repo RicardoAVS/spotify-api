@@ -1,0 +1,4 @@
+.idea/*
+/notebooks/**
+.ipynb_checkpoints/**
+convert.sh
