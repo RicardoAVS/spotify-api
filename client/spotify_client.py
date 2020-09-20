@@ -1,15 +1,13 @@
 import requests
 import base64
 import datetime
-import urllib.request
 import urllib.parse
-import urllib.error
-import urllib.response
+
 
 def handle_status_code(status_code):
     if status_code not in range(200, 299):
         raise Exception('Resource Not Found')
-    return True 
+    return True
 
 
 class SpotifyAPI(object):
@@ -72,10 +70,10 @@ class SpotifyAPI(object):
             raise Exception('Either there is no access token or session has expired.')
         return token
 
-    """"@id: The spotify ID for each resource
+    """@id: The spotify ID for each resource
         @resource: the search will be based upon this (album, artist, track, etc.)
         @version: spotify API current version 
-    """"
+    """
     def get_resource(self, _id, resource, version='v1'):
         endpoint = f'https://api.spotify.com/{version}/{resource}/{_id}'
         headers = self.get_resource_header()
@@ -142,11 +140,12 @@ class SpotifyAPI(object):
             print(query)
 
         if operator is not None and query_operator is not None:
-            if isinstance(query_operator, str):
-                if operator.lower() == 'or' or operator.lower() == 'not':
-                    operator = operator.upper()
-                    # Allow to perform an operator query like q=roadhouse%20NOT%20blues
-                    query = f'{query} {operator} {query_operator}'
+            if not isinstance(query_operator, str):
+                continue
+            if operator.lower() == 'or' or operator.lower() == 'not':
+                operator = operator.upper()
+                # Allow to perform an operator query like q=roadhouse%20NOT%20blues
+                query = f'{query} {operator} {query_operator}'
 
             query_data = urllib.parse.urlencode({'q': query, 'type': query_type.lower()})
             print(query_data)
