@@ -6,8 +6,7 @@ verify_ssl = true
 [dev-packages]
 
 [packages]
-jupyter = "*"
-psycopg2 = "*"
+jupyter = "*
 nbconvert = "*"
 requests = "*"
 
