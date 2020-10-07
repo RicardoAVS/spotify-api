@@ -47,6 +47,7 @@ class SpotifyAPI(object):
         return { 'grant_type': 'client_credentials' }
     
     
+    # Authenticate user, this step is required since we will need an acess token to call the API 
     def do_authentication(self):
         url = self.token_url
         headers = self.get_token_header()
@@ -75,7 +76,11 @@ class SpotifyAPI(object):
             raise Exception('Either there is no access token or session has expired.')
         return token
         
-    
+        
+    """@id: The spotify ID for each resource
+        @resource: the search will be based upon this (album, artist, track, etc.)
+        @version: spotify API current version 
+    """    
     def get_resource(self, _id, resource, version='v1'):
         endpoint = f'https://api.spotify.com/{version}/{resource}/{_id}'
         headers = self.get_resource_header()
@@ -94,6 +99,18 @@ class SpotifyAPI(object):
         return self.get_resource(_id, resource='artists')
         
         
+     """
+        Get Spotify Catalog information about albums, artists, playlists, tracks, shows or episodes that match a keyword string
+        @query: 	Required.
+                    Search query keywords and optional field filters and operators.
+                    For example: q=roadhouse%20blues
+                    
+        @query_type: Required.
+                    A comma-separated list of item types to search across.
+                    Valid types are: album , artist, playlist, track, show and episode.
+                    Search results include hits from all the specified item types.
+                    For example: q=name:abacab&type=album,track returns both albums and tracks with “abacab” included in their name.
+    """
     def base_search(self, query, query_type='track'):
         endpoint= 'https://api.spotify.com/v1/search?'
         headers = self.get_resource_header()
@@ -105,7 +122,25 @@ class SpotifyAPI(object):
         if not self.handle_status_code(status_code):
             return {}
         return response.json()
-    
+        
+        
+     """
+        @operator: The operator NOT can be used to exclude results.
+        For example: q=roadhouse%20NOT%20blues returns items that match “roadhouse” but excludes those that also contain the keyword “blues”. 
+        
+        Similarly, the OR operator can be used to broaden the search: q=roadhouse%20OR%20blues returns all the results that include either of the terms.
+        Only one OR operator can be used in a query.
+        
+        Note: Operators must be specified in uppercase.
+        
+        example use case: query='All I Want', operator='NOT', query_operator='A Day To Remember'
+        
+        Field filters: By default, results are returned when a match is found in any field of the target object type. 
+        Searches can be made more specific by specifying an album, artist or track field filter.
+        
+        For example: The query q=album:gold%20artist:abba&type=album 
+        returns only albums with the text “gold” in the album name and the text “abba” in the artist name.
+    """
     def search(self, query=None, operator=None, query_operator=None, query_type='artists'):
         if query is None:
             raise Exception('A query is required.')
